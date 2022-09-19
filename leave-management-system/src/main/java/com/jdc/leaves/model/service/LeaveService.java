@@ -29,6 +29,8 @@ public class LeaveService {
 
 	private NamedParameterJdbcTemplate template;
 	
+	private boolean b = false;
+	
 	private static final String LEAVE_COUNT_SQL = """
 			select count(leave_date) from leaves_day 
 			where leave_date = :target and leaves_classes_id = :classId
@@ -103,29 +105,32 @@ public class LeaveService {
 	@Transactional
 	public void save(LeaveForm form) throws DuplicateKeyException{
 		
-		if(form.getStartDate().isAfter(LocalDateTime.now().minusDays(1).toLocalDate()) ) {
-			
-			insert.execute(
-					Map.of("apply_date", LocalDateTime.now(),
-					"classes_id",form.getClassId(),
-					"student_id",form.getStudentId(),
-					"start_date", Date.valueOf(form.getStartDate()),
-					"days", form.getDays(),
-					"reason", form.getReason()
-					));
-						
-				insertDay.execute(Map.of(
-						"leave_date", Date.valueOf(form.getStartDate()),
-						"leaves_apply_date", LocalDateTime.now(),
-						"leaves_classes_id",form.getClassId(),
-						"leaves_student_id",form.getStudentId()
+		for(int i = 1; i<leaveDate(form.getStudentId()).size();i++) {
+			 b = leaveDate(form.getStudentId()).stream().anyMatch(a ->a.getStartDate().equals(form.getStartDate()));
+			}
+	
+			if(b || form.getStartDate().isBefore(LocalDateTime.now().plusDays(1).toLocalDate())) {
+				throw new DateTimeException("The start date should be bigger than today's date %s or %s"
+						.formatted(LocalDateTime.now().toLocalDate(),"Today, You have alreday beean left for this class"));
+			}else {
+				insert.execute(
+						Map.of("apply_date", LocalDateTime.now(),
+						"classes_id",form.getClassId(),
+						"student_id",form.getStudentId(),
+						"start_date", Date.valueOf(form.getStartDate()),
+						"days", form.getDays(),
+						"reason", form.getReason()
 						));
-		}else {
-			 throw new DateTimeException("The start date should be bigger than or equal today's date (%s)"
-					 .formatted(LocalDateTime.now().toLocalDate()));
-		}	
-	}
-
+				for(int i = 0; i<form.getDays() ;i++) {	
+					insertDay.execute(Map.of(
+							"leave_date", Date.valueOf(form.getStartDate().plusDays(i)),
+							"leaves_apply_date", LocalDateTime.now(),
+							"leaves_classes_id",form.getClassId(),
+							"leaves_student_id",form.getStudentId()
+							));
+		}
+		}
+	}	
 	public List<LeaveSummaryVO> searchSummary(Optional<LocalDate> target) {
 
 		// Find Classes
@@ -149,5 +154,11 @@ public class LeaveService {
 		var stdId = studentService.findStudentByEmail(SecurityContextHolder
 				.getContext().getAuthentication().getName());
 		return stdId;
+	}
+	
+	private List<LeaveListVO> leaveDate(int id){
+		return template.query("select leave_date startDate  from leaves_day where leaves_student_id = :id",
+				Map.of("id",id),
+				new BeanPropertyRowMapper<>(LeaveListVO.class));
 	}
 }

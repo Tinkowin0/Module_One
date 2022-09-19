@@ -37,7 +37,9 @@
 					<!-- Teacher Id -->
 					<div class="mb-3">
 						<label class="form-label">Teacher</label>
-						<sf:select path="teacher" items="${teachers}" itemLabel="name" itemValue="id" cssClass="form-select"></sf:select>
+						<sf:select path="teacher" cssClass="form-select">
+						<sf:options path="teacher" items="${teachers}"  itemLabel="name" itemValue="id" ></sf:options>
+						</sf:select>
 						<sf:errors path="teacher" cssClass="text-secondary"></sf:errors>
 					</div>
 					

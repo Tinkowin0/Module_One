@@ -23,7 +23,6 @@ public class LeaveListVO {
 		this.days = days;
 		this.reason = reason;
 	}
-
 	private LocalDate applyDate;
 
 	private int classId;

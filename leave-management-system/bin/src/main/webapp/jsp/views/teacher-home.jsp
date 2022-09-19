@@ -13,7 +13,6 @@
 
 </head>
 <body>
-
 	<c:import url="/jsp/include/navbar.jsp"></c:import>
 
 	<div class="container">
@@ -26,7 +25,7 @@
 			</div>
 			
 			<div class="col-auto">
-				<button class="btn btn-outline-success" type="submit">
+				<button class="btn btn-outline-success">
 					<i class="bi bi-search"></i> Search
 				</button>
 			</div>
@@ -57,7 +56,8 @@
 							<div class="row mt-4">
 								<div class="col">
 									<c:url var="details" value="/classes/${ item.classId }"></c:url>
-									<a href="${ details }" class="btn btn-outline-success"><i class="bi bi-send"></i> Show Details</a>
+									<a href="${ details }" class="btn btn-outline-success">
+										<i class="bi bi-send"></i> Show Details</a>
 								</div>
 							</div>
 						</div>

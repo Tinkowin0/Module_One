@@ -65,7 +65,6 @@
 								</div>
 								
 								<div>
-								
 									<c:url var="applyLeave" value="/leaves/edit">
 										<c:param name="classId" value="${ item.classId }"></c:param>
 										<c:param name="studentId" value="${ item.studentId }"></c:param>
@@ -74,18 +73,12 @@
 										<i class="bi bi-send"></i> Apply Leave
 									</a>
 								</div>
-							
 							</div>
 						</div>					
 					</c:forEach>
 				</div>
-			
 			</div>
-	
 		</div>
-		
-	
 	</div>
-	
 </body>
 </html>
